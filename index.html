@@ -38,20 +38,29 @@
         </form>
 
         <div class="actions" aria-label="Certificate actions">
-          <button id="downloadPngButton" class="primary-action" type="button">
-            Download PNG
+          <button id="generateButton" class="primary-action generate-action" type="button">
+            Generate Certificate
           </button>
-          <button id="printButton" type="button">
-            Print PDF
-          </button>
-          <button id="resetButton" type="button">
-            Reset
-          </button>
+          <div class="generated-actions" aria-label="Generated certificate actions">
+            <button id="downloadPngButton" type="button">
+              Download PNG
+            </button>
+            <button id="printButton" type="button">
+              Print PDF
+            </button>
+            <button id="resetButton" type="button">
+              Reset
+            </button>
+          </div>
         </div>
       </aside>
 
       <section class="preview-panel" aria-label="Certificate preview">
-        <div class="certificate-stage">
+        <div id="previewPlaceholder" class="preview-placeholder" aria-hidden="true">
+          <span></span>
+        </div>
+
+        <div id="certificateStage" class="certificate-stage" hidden>
           <svg id="certificateSvg" viewBox="0 0 1400 990" role="img" aria-labelledby="certificateTitle certificateDesc">
             <title id="certificateTitle">Certificate of Participation</title>
             <desc id="certificateDesc">A robotics-themed certificate generated from the provided PowerPoint template.</desc>

@@ -15,11 +15,15 @@ const elements = {
   activityText: document.querySelector("#activityText"),
   dateVenueText: document.querySelector("#dateVenueText"),
   svg: document.querySelector("#certificateSvg"),
+  stage: document.querySelector("#certificateStage"),
+  generateButton: document.querySelector("#generateButton"),
   downloadButton: document.querySelector("#downloadPngButton"),
   printButton: document.querySelector("#printButton"),
   resetButton: document.querySelector("#resetButton"),
   toast: document.querySelector("#toast"),
 };
+
+let hasGeneratedCertificate = false;
 
 function cleanSpaces(value) {
   return String(value || "").trim().replace(/\s+/g, " ");
@@ -124,11 +128,27 @@ function showToast(message) {
   }, 3200);
 }
 
+function revealCertificate() {
+  hasGeneratedCertificate = true;
+  elements.stage.hidden = false;
+  document.body.classList.add("is-generated");
+  updateCertificate();
+  elements.stage.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function ensureGenerated() {
+  if (!hasGeneratedCertificate) {
+    revealCertificate();
+  } else {
+    updateCertificate();
+  }
+}
+
 async function downloadPng() {
   elements.downloadButton.disabled = true;
 
   try {
-    updateCertificate();
+    ensureGenerated();
 
     const exportSvg = await inlineSvgImages(elements.svg);
     const svgMarkup = new XMLSerializer().serializeToString(exportSvg);
@@ -173,12 +193,16 @@ function resetForm() {
   elements.activityInput.value = defaults.activity;
   elements.venueInput.value = defaults.venue;
   updateCertificate();
+  hasGeneratedCertificate = false;
+  elements.stage.hidden = true;
+  document.body.classList.remove("is-generated");
 }
 
 elements.form.addEventListener("input", updateCertificate);
+elements.generateButton.addEventListener("click", revealCertificate);
 elements.downloadButton.addEventListener("click", downloadPng);
 elements.printButton.addEventListener("click", () => {
-  updateCertificate();
+  ensureGenerated();
   window.print();
 });
 elements.resetButton.addEventListener("click", resetForm);
