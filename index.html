@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Certificate Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="controls" aria-label="Certificate details">
+        <header class="brand-block">
+          <p>Almagro National High School</p>
+          <h1>Certificate Generator</h1>
+        </header>
+
+        <form id="certificateForm" class="form-grid">
+          <label>
+            <span>Participant name</span>
+            <input id="participantNameInput" name="participantName" type="text" autocomplete="name" placeholder="Type your full name">
+          </label>
+
+          <label>
+            <span>Event date</span>
+            <input id="eventDateInput" name="eventDate" type="date" value="2026-07-18">
+          </label>
+
+          <label>
+            <span>Activity</span>
+            <input id="activityInput" name="activity" type="text" value="SCHOOL-BASED ROBOTEACH 4.0">
+          </label>
+
+          <label>
+            <span>Venue</span>
+            <input id="venueInput" name="venue" type="text" value="Almagro National High School, Almagro, Samar">
+          </label>
+        </form>
+
+        <div class="actions" aria-label="Certificate actions">
+          <button id="downloadPngButton" class="primary-action" type="button">
+            Download PNG
+          </button>
+          <button id="printButton" type="button">
+            Print PDF
+          </button>
+          <button id="resetButton" type="button">
+            Reset
+          </button>
+        </div>
+      </aside>
+
+      <section class="preview-panel" aria-label="Certificate preview">
+        <div class="certificate-stage">
+          <svg id="certificateSvg" viewBox="0 0 1400 990" role="img" aria-labelledby="certificateTitle certificateDesc">
+            <title id="certificateTitle">Certificate of Participation</title>
+            <desc id="certificateDesc">A robotics-themed certificate generated from the provided PowerPoint template.</desc>
+
+            <image href="assets/certificate-background.png" x="0" y="0" width="1400" height="990" preserveAspectRatio="none"></image>
+            <image href="assets/deped-header.png" x="535" y="24" width="330" height="258" preserveAspectRatio="xMidYMid meet"></image>
+            <image href="assets/school-seal.png" x="1057" y="96" width="121" height="114" preserveAspectRatio="xMidYMid meet"></image>
+            <image href="assets/robotics-logo.png" x="1185" y="70" width="160" height="160" preserveAspectRatio="xMidYMid meet"></image>
+
+            <text class="eyebrow-text" x="700" y="306" text-anchor="middle">ROBOTICS  &#8226;  INNOVATION  &#8226;  TECHNOLOGY</text>
+            <text class="certificate-heading" x="700" y="365" text-anchor="middle">CERTIFICATE OF PARTICIPATION</text>
+            <line class="cyan-line" x1="490" y1="383" x2="910" y2="383"></line>
+
+            <text class="presented-text" x="700" y="419" text-anchor="middle">This Certificate of Participation is proudly presented to</text>
+            <text id="participantNameText" class="participant-name" x="700" y="476" text-anchor="middle">[NAME OF PARTICIPANT]</text>
+            <line class="name-line" x1="365" y1="495" x2="1035" y2="495"></line>
+
+            <text class="lead-text" x="700" y="527" text-anchor="middle">for active participation in</text>
+            <text id="activityText" class="activity-text" x="700" y="579" text-anchor="middle">SCHOOL-BASED ROBOTEACH 4.0</text>
+
+            <text class="body-text" x="700" y="620" text-anchor="middle">
+              <tspan id="dateVenueText" x="700">held on July 18, 2026 at Almagro National High School, Almagro, Samar.</tspan>
+              <tspan x="700" dy="22">Awarded in recognition of dedication, creativity, teamwork, and commitment to robotics and technological innovation.</tspan>
+            </text>
+
+            <image href="assets/signature-john.png" x="237" y="672" width="126" height="82" preserveAspectRatio="xMidYMid meet"></image>
+            <image href="assets/signature-nieves.png" x="576" y="693" width="250" height="67" preserveAspectRatio="xMidYMid meet"></image>
+            <image href="assets/signature-carye.png" x="1035" y="630" width="150" height="132" preserveAspectRatio="xMidYMid meet"></image>
+
+            <line class="signature-line" x1="130" y1="755" x2="470" y2="755"></line>
+            <line class="signature-line" x1="530" y1="755" x2="870" y2="755"></line>
+            <line class="signature-line" x1="930" y1="755" x2="1270" y2="755"></line>
+
+            <text class="signer-name" x="300" y="781" text-anchor="middle">JOHN RIB A. CANANGA</text>
+            <text class="signer-role" x="300" y="811" text-anchor="middle">Robotics Coordinator</text>
+
+            <text class="signer-name" x="700" y="781" text-anchor="middle">NIEVES D. GERAS</text>
+            <text class="signer-role" x="700" y="811" text-anchor="middle">School Principal II</text>
+
+            <text class="signer-name" x="1100" y="781" text-anchor="middle">CARYE JAMES ADELANTE</text>
+            <text class="signer-role" x="1100" y="811" text-anchor="middle">Robotics Coordinator</text>
+
+            <text class="footer-text" x="700" y="921" text-anchor="middle">ALMAGRO NATIONAL HIGH SCHOOL  &#8226;  ROBOTICS AND TECHNOLOGY</text>
+          </svg>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" hidden></div>
+  </body>
+</html>

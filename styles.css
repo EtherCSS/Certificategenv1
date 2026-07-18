@@ -1,0 +1,295 @@
+:root {
+  color-scheme: light;
+  --page-bg: #edf2f6;
+  --panel-bg: #ffffff;
+  --ink: #102033;
+  --muted: #536171;
+  --line: #d7e0e8;
+  --navy: #082b59;
+  --blue: #007fae;
+  --cyan: #00b9ea;
+  --button: #073261;
+  --button-hover: #0a437f;
+  --shadow: 0 18px 44px rgba(8, 43, 89, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-right: 1px solid var(--line);
+  background: var(--panel-bg);
+  padding: 28px 24px;
+}
+
+.brand-block p {
+  margin: 0 0 8px;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.brand-block h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #cbd6df;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: var(--ink);
+  padding: 10px 12px;
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 185, 234, 0.18);
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+
+button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #cbd6df;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  border-color: #9eb2c3;
+  background: #f6f9fb;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
+.primary-action {
+  border-color: var(--button);
+  background: var(--button);
+  color: #ffffff;
+}
+
+.primary-action:hover {
+  border-color: var(--button-hover);
+  background: var(--button-hover);
+}
+
+.preview-panel {
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 32px;
+}
+
+.certificate-stage {
+  width: min(100%, 1400px);
+  min-width: 760px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+#certificateSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.eyebrow-text,
+.certificate-heading,
+.activity-text,
+.signer-name,
+.footer-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+}
+
+.eyebrow-text {
+  fill: #111827;
+  font-size: 16px;
+}
+
+.certificate-heading {
+  fill: var(--navy);
+  font-size: 49px;
+}
+
+.cyan-line {
+  stroke: var(--cyan);
+  stroke-width: 4;
+}
+
+.presented-text {
+  fill: #41536b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-style: italic;
+}
+
+.participant-name {
+  fill: var(--navy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 44px;
+  font-weight: 700;
+}
+
+.name-line,
+.signature-line {
+  stroke: var(--navy);
+  stroke-width: 2;
+}
+
+.lead-text {
+  fill: #41536b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.activity-text {
+  fill: var(--blue);
+  font-size: 34px;
+}
+
+.body-text {
+  fill: #41536b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+}
+
+.signer-name {
+  fill: var(--navy);
+  font-size: 18px;
+}
+
+.signer-role {
+  fill: #52657b;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+}
+
+.footer-text {
+  fill: #111827;
+  font-size: 13px;
+}
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  max-width: min(360px, calc(100vw - 40px));
+  border-radius: 8px;
+  background: #102033;
+  color: #ffffff;
+  padding: 12px 14px;
+  box-shadow: 0 12px 30px rgba(16, 32, 51, 0.24);
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .actions {
+    grid-template-columns: 1fr 1fr;
+    margin-top: 0;
+  }
+
+  .primary-action {
+    grid-column: 1 / -1;
+  }
+
+  .preview-panel {
+    justify-content: start;
+    padding: 18px;
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 0;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  .controls,
+  .toast {
+    display: none !important;
+  }
+
+  .app-shell,
+  .preview-panel {
+    display: block;
+    min-height: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .certificate-stage {
+    width: 100vw;
+    min-width: 0;
+    box-shadow: none;
+  }
+}
