@@ -20,10 +20,14 @@ const elements = {
   downloadButton: document.querySelector("#downloadPngButton"),
   printButton: document.querySelector("#printButton"),
   resetButton: document.querySelector("#resetButton"),
+  printSheet: document.querySelector("#printSheet"),
+  printImage: document.querySelector("#printCertificateImage"),
   toast: document.querySelector("#toast"),
 };
 
 let hasGeneratedCertificate = false;
+let printImageUrl = "";
+let printRefreshTimer = 0;
 
 function cleanSpaces(value) {
   return String(value || "").trim().replace(/\s+/g, " ");
@@ -97,6 +101,87 @@ async function inlineSvgImages(svg) {
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
+  const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+  style.textContent = `
+    .eyebrow-text,
+    .certificate-heading,
+    .activity-text,
+    .signer-name,
+    .footer-text {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+    }
+
+    .eyebrow-text {
+      fill: #111827;
+      font-size: 16px;
+    }
+
+    .certificate-heading {
+      fill: #082b59;
+      font-size: 49px;
+    }
+
+    .cyan-line {
+      stroke: #00b9ea;
+      stroke-width: 4;
+    }
+
+    .presented-text {
+      fill: #41536b;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 21px;
+      font-style: italic;
+    }
+
+    .participant-name {
+      fill: #082b59;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 44px;
+      font-weight: 700;
+    }
+
+    .name-line,
+    .signature-line {
+      stroke: #082b59;
+      stroke-width: 2;
+    }
+
+    .lead-text {
+      fill: #41536b;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 20px;
+    }
+
+    .activity-text {
+      fill: #007fae;
+      font-size: 34px;
+    }
+
+    .body-text {
+      fill: #41536b;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+    }
+
+    .signer-name {
+      fill: #082b59;
+      font-size: 18px;
+    }
+
+    .signer-role {
+      fill: #52657b;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+    }
+
+    .footer-text {
+      fill: #111827;
+      font-size: 13px;
+    }
+  `;
+  clone.insertBefore(style, clone.firstChild);
+
   const imageElements = Array.from(clone.querySelectorAll("image"));
   await Promise.all(imageElements.map(async (image) => {
     const href = image.getAttribute("href") || image.getAttributeNS("http://www.w3.org/1999/xlink", "href");
@@ -119,6 +204,80 @@ function loadImage(url) {
   });
 }
 
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("PNG export failed."));
+      }
+    }, "image/png", 1);
+  });
+}
+
+async function renderCertificatePngBlob() {
+  const exportSvg = await inlineSvgImages(elements.svg);
+  const svgMarkup = new XMLSerializer().serializeToString(exportSvg);
+  const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+
+  try {
+    const image = await loadImage(svgUrl);
+    const canvas = document.createElement("canvas");
+    canvas.width = 2800;
+    canvas.height = 1980;
+
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return await canvasToBlob(canvas);
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
+}
+
+function waitForPrintImage() {
+  return new Promise((resolve, reject) => {
+    if (elements.printImage.complete && elements.printImage.naturalWidth > 0) {
+      resolve();
+      return;
+    }
+
+    elements.printImage.onload = () => resolve();
+    elements.printImage.onerror = reject;
+  });
+}
+
+async function setPrintImage(blob) {
+  if (printImageUrl) {
+    URL.revokeObjectURL(printImageUrl);
+  }
+
+  printImageUrl = URL.createObjectURL(blob);
+  elements.printImage.src = printImageUrl;
+  await waitForPrintImage();
+  document.body.classList.add("is-print-ready");
+}
+
+async function preparePrintImage() {
+  ensureGenerated();
+  const blob = await renderCertificatePngBlob();
+  await setPrintImage(blob);
+}
+
+function schedulePrintImageRefresh() {
+  if (!hasGeneratedCertificate) return;
+
+  document.body.classList.remove("is-print-ready");
+  window.clearTimeout(printRefreshTimer);
+  printRefreshTimer = window.setTimeout(() => {
+    preparePrintImage().catch(() => {});
+  }, 350);
+}
+
 function showToast(message) {
   elements.toast.textContent = message;
   elements.toast.hidden = false;
@@ -134,6 +293,7 @@ function revealCertificate() {
   document.body.classList.add("is-generated");
   updateCertificate();
   elements.stage.scrollIntoView({ behavior: "smooth", block: "center" });
+  schedulePrintImageRefresh();
 }
 
 function ensureGenerated() {
@@ -150,40 +310,31 @@ async function downloadPng() {
   try {
     ensureGenerated();
 
-    const exportSvg = await inlineSvgImages(elements.svg);
-    const svgMarkup = new XMLSerializer().serializeToString(exportSvg);
-    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const image = await loadImage(svgUrl);
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 2800;
-    canvas.height = 1980;
-
-    const context = canvas.getContext("2d");
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-    URL.revokeObjectURL(svgUrl);
-
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        showToast("PNG export failed.");
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = fileNameFromParticipant();
-      link.click();
-      URL.revokeObjectURL(link.href);
-      showToast("PNG downloaded.");
-    }, "image/png", 1);
+    const blob = await renderCertificatePngBlob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileNameFromParticipant();
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast("PNG downloaded.");
   } catch (error) {
     showToast("PNG export works from GitHub Pages or a local web server.");
   } finally {
     elements.downloadButton.disabled = false;
+  }
+}
+
+async function printCertificate() {
+  elements.printButton.disabled = true;
+
+  try {
+    await preparePrintImage();
+    document.body.classList.add("is-printing-certificate");
+    window.print();
+  } catch (error) {
+    showToast("Print preparation failed. Try Download PNG, then print the downloaded file.");
+  } finally {
+    elements.printButton.disabled = false;
   }
 }
 
@@ -195,16 +346,20 @@ function resetForm() {
   updateCertificate();
   hasGeneratedCertificate = false;
   elements.stage.hidden = true;
-  document.body.classList.remove("is-generated");
+  document.body.classList.remove("is-generated", "is-print-ready", "is-printing-certificate");
+  window.clearTimeout(printRefreshTimer);
 }
 
-elements.form.addEventListener("input", updateCertificate);
+elements.form.addEventListener("input", () => {
+  updateCertificate();
+  schedulePrintImageRefresh();
+});
 elements.generateButton.addEventListener("click", revealCertificate);
 elements.downloadButton.addEventListener("click", downloadPng);
-elements.printButton.addEventListener("click", () => {
-  ensureGenerated();
-  window.print();
-});
+elements.printButton.addEventListener("click", printCertificate);
 elements.resetButton.addEventListener("click", resetForm);
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("is-printing-certificate");
+});
 
 updateCertificate();
